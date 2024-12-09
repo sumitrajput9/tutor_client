@@ -1,0 +1,767 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { TeacherIdentifications } from './TutorComponent/teacherIdentification';
+import { TeacherAcademic } from './TutorComponent/teacherAcademic';
+import { TeacherEmployment } from './TutorComponent/teacherEmp';
+import { TeacherBio } from './TutorComponent/teacherBio';
+import { TeacherEducation } from './TutorComponent/teacherEducation';
+import { TeacherAvailability } from './TutorComponent/teacherAvailability';
+import { toast } from 'react-toastify';
+import { AiOutlineEdit } from 'react-icons/ai';
+
+export default function TutorApproval() {
+    const [tutors, setTutors] = useState([]);
+    const [selectedTutor, setSelectedTutor] = useState(null);
+    const [tutorDetails, setTutorDetails] = useState({});
+    const [tutorProfile, setTutorProfile] = useState([]);
+    const [status, setStatus] = useState('');
+    const [remark, setRemark] = useState('');
+    const [filteredTutors, setfilteredTutors] = useState([]);
+    const token = localStorage.getItem('token') || '';
+    // Separate states for each section
+    const [teacherInfo, setTeacherInfo] = useState([]);
+    const [teacherIdentifications, setTeacherIdentifications] = useState([]);
+    const [teacherAcademic, setTeacherAcademic] = useState([]);
+    const [teacherEmp, setTeacherEmp] = useState([]);
+    const [teacherBio, setTeacherBio] = useState([]);
+    const [teacherEdu, setTeacherEdu] = useState([]);
+    const [teacherAvail, setTeacherAvail] = useState([]);
+    const [statusOptionss] = useState(["Approve", "Reject", "Remark"]);
+
+    const [profileAction, setProfileAction] = useState('');
+    const [profileRemark, setProfileRemark] = useState('');
+    const [tutorstatus, setTutorStatus] = useState('');
+    // State for academic section action and remark
+    const [academicAction, setAcademicAction] = useState('');
+    const [academicRemark, setAcademicRemark] = useState('');
+    const [teacherId, setTeacherId] = useState('');
+    // State for selected action and remark input
+    const [selectedAction, setSelectedAction] = useState("");
+    const [editable, setEditable] = useState(false);
+    const [initialTeacherInfo, setIntialTeacherInfo] = useState([]);
+    const [userId, setUserId] = useState('');
+
+    const [showButtons, setShowButtons] = useState(false);
+    //   const [remark, setRemark] = useState("");
+    // Fetch users (tutors) when the component mounts
+    useEffect(() => {
+        const fetchTutors = async () => {
+            try {
+                const response = await axios.post('https://testapi.tutorgator.com.au/get_users', {}, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                });
+
+                const filteredTutors = response.data.data.filter(tutor => tutor.user_type === 'teacher');
+                setfilteredTutors(filteredTutors);
+                setTutors(filteredTutors);
+            } catch (error) {
+                console.error('Error fetching tutors:', error);
+            }
+        };
+        fetchTutors();
+    }, [token]);
+
+    // Fetch tutor details when a tutor is selected
+    const handleTutorSelect = async (teacherId) => {
+        try {
+          setShowButtons(false);
+            const response = await axios.post(
+                'https://testapi.tutorgator.com.au/get_teacher_info',
+                { teacher_id: teacherId }, // Data payload
+                { // Third parameter for config
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+        
+
+            if (response?.data?.data?.teacher_info?.id) {
+                setTeacherId(response?.data?.data?.teacher_info?.id)
+                console.log(response?.data?.data ,"response?.data?.data?.teacher_info?.id ");
+                
+                const data = await axios.post('https://testapi.tutorgator.com.au/get_teacher_info_by_user_id', { user_id: response?.data?.data?.teacher_info?.id }, // Data payload
+                    { // Third parameter for config
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    })
+                if (data?.data?.success === true) {
+                    setTeacherIdentifications(data?.data?.data?.teacher_identification);
+                    setTeacherAcademic({
+                        ...data?.data?.data?.teacher_academic,
+                        user_id: response?.data?.data?.teacher_info?.id
+                    });
+                    setTeacherEmp({
+                        ...data?.data?.data?.teacher_employment,
+                        user_id: response?.data?.data?.teacher_info?.id
+                    });
+                    setTeacherEdu(data?.data?.data?.teachers_education);
+
+                    setUserId(data?.data?.data?.teacher_bio?.teacher_id)
+                    setTeacherBio({
+                        ...data?.data?.data?.teacher_bio,
+                        user_id: response?.data?.data?.teacher_info?.id
+                    });
+                    setTeacherInfo(data?.data?.data?.teacher_info);
+                    setIntialTeacherInfo(data?.data?.data?.teacher_info)
+                    setTeacherAvail(data?.data?.data?.teachers_availability)
+                }
+
+            }
+            setTutorDetails(response?.data?.data);
+            setSelectedTutor(teacherId);
+        } catch (error) {
+            console.error('Error fetching tutor details:', error);
+        }
+    };
+
+    // Handle approval/rejection
+    const handleApproval = async (action, event) => {
+        event.preventDefault();
+        console.log(action);
+        console.log(remark);
+        const formData = new FormData();
+        formData.append("teacher_id", selectedTutor);
+        formData.append("status", action);
+        formData.append("remark", remark);
+        formData.append("editable", "false");
+        try {
+            const response = await axios.post(
+                'https://testapi.tutorgator.com.au/cms_tutor_profile',
+                formData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+            console.log(response);
+
+            alert(response.data.message);
+            setStatus(''); // Reset status
+            setRemark(''); // Reset remark
+        } catch (error) {
+            console.error('Error updating tutor status:', error);
+        }
+    };
+
+    const statusOptions = ['profile incomplete', 'pending activation', 'active', 'suspended', 'Deactivated'];
+    // let filteredTutorss = tutors.filter(tutor => tutor.status === status);
+    // setfilteredTutors(filteredTutorss);
+    useEffect(() => {
+        if (status) {   
+            const filteredByStatus = tutors.filter(tutor => tutor.status === status);
+            setfilteredTutors(filteredByStatus);
+        } else {
+            setfilteredTutors(tutors);
+        }
+    }, [tutors, status]);
+
+    const handleActionChange = (event) => {
+        const action = event.target.value;
+        setSelectedAction(action);
+        if (action !== "Remark") {
+            setRemark(""); // Clear remark if action is not "Remark"
+        }
+    };
+
+    const handleProfileActionChange = (e) => {
+        const action = e.target.value;
+        setProfileAction(action);
+
+        if (action === "Remark") {
+            // setProfileAction(""); // Reset tutor status if "Remark" is selected
+        } else if (action === "Approved") {
+            setProfileAction("Active");
+        } else if (action === "Rejected") {
+            setProfileAction("Deactivated");
+        }
+
+        // Clear profileRemark if action is not "Remark"
+        if (action !== "Remark") {
+            setProfileRemark('');
+        }
+    };
+
+
+    const handleAcademicActionChange = (e) => {
+        setAcademicAction(e.target.value);
+        if (e.target.value !== "Remark") {
+            setAcademicRemark(''); // Clear remark if action is not "Remark"
+        }
+    };
+
+    const handleProfileRemarkChange = (e) => {
+        setProfileRemark(e.target.value);
+    };
+
+    const handleAcademicRemarkChange = (e) => {
+        setAcademicRemark(e.target.value);
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        console.log("Selected Action:", selectedAction);
+        if (selectedAction === "Remark") {
+            console.log("Remark:", remark);
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setTeacherInfo((prevInfo) => ({
+            ...prevInfo,
+            [name]: value,
+        }));
+    };
+    // profileSaved
+    const handleProfile = async () => {
+        const formData = new FormData();
+        console.log(profileAction);
+        let status = '';
+        if (profileAction === 'Approve') {
+            status = 'Active'
+        } else if (profileAction === 'Reject') {
+            status = 'Deactivated'
+        }
+
+        formData.append('teacher_id', teacherInfo?.id);
+        formData.append('tutor_status', status);
+        formData.append('remark', profileRemark);
+        formData.append('editable', "false"); // Set editable to "false" as required
+
+        try {
+            const response = await fetch('https://testapi.tutorgator.com.au/cms_tutor_profile', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+            toast.success('Profile updated successfully');
+                if (data.data === null) {
+                    const updatedProfile = await axios.post('https://testapi.tutorgator.com.au/get_teacher_info_by_user_id', { user_id: teacherId }, // Data payload
+                        { // Third parameter for config
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        })
+                    // const profileData = await updatedProfile.json();
+                    // console.log('Updated profile data:', profileData);
+                }
+
+            } else {
+                console.error('Error updating profile:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const toggleEdit = () => {
+        setEditable(!editable);
+    };
+
+    const handleUpdate = async () => {
+        const formData = new FormData();
+
+        formData.append("user_id", teacherInfo.user_id);
+        // formData.append("first_name", "sumit");
+        formData.append('email', teacherInfo.email);
+        formData.append('mobile', teacherInfo.mobile);
+        Object.entries(teacherInfo).forEach(([key, value]) => {
+            if (value !== null && value !== undefined && value !== initialTeacherInfo[key]) {
+                formData.append(key, value);
+            }
+        });
+        try {
+            const response = await axios.post(
+                'https://testapi.tutorgator.com.au/teacher_update_profile',
+                formData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+            toast.success("Profile updated successfully!");
+            setEditable(false);
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            toast.error("Failed to update profile. Please try again.");
+        }
+    };
+
+
+
+    const handleTutorSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(
+                "https://testapi.tutorgator.com.au/cms_tutor_status_change",
+                { teacher_id: userId, status:tutorstatus },
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            alert("Tutor status updated successfully!");
+        } catch (error) {
+            console.error("Error updating status:", error);
+            alert("Failed to update tutor status.");
+        }
+    };
+
+    const handleSelct = (e) => {
+        setStatus(e.target.value)
+        setTutorStatus(e.target.value);
+        setShowButtons(true);
+    }
+
+    return (
+        <div className="flex flex-col">
+            {/* Header */}
+            <header className="bg-[#e8f9f3] text-white p-4 m-0">
+                <h1 className="text-xl font-bold text-black">Tutor Approval</h1>
+            </header>
+            {/* Main Content */}
+            <main className="p-4">
+                <h2>Welcome to the Tutor Dashboard</h2>
+                <div className='flex'>
+                    <div>
+                        <label htmlFor="statusSelect" className="block mb-2">Select Status:</label>
+                        <select
+                            id="statusSelect"
+                            value={status}
+                            onChange={handleSelct}
+                            className="border p-2"
+                        >
+                            <option value="">--Select Status--</option>
+                            {statusOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <div className="ms-2">
+                            <label htmlFor="tutorSelect" className="block mb-2">Select Tutor:</label>
+                            <select
+                                id="tutorSelect"
+                                onChange={(e) => handleTutorSelect(e.target.value)}
+                                className="border p-2"
+                            >
+                                <option value="">--Select Tutor--</option>
+                                {filteredTutors.map((tutor) => (
+                                    <option key={tutor.id} value={tutor.id}>
+                                        {tutor.first_name} {tutor.last_name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                    </div>
+                   
+                </div>
+                 <div className='flex'>
+                 {showButtons && (
+                        <div className="mt-6 grid grid-cols-2 gap-4">
+                            {filteredTutors.map((tutor) => (
+                                <button
+                                    key={tutor.id}
+                                    className="p-3 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition"
+                                    onClick={() => handleTutorSelect(tutor.id)}
+                                >
+                                    {tutor.first_name} {tutor.last_name}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                 </div>
+                {selectedTutor && (
+                    <div className="mt-4">
+                        <h3 className="font-bold">Tutor Details</h3>
+                        <form onSubmit={handleSubmit}>
+                            {/* Profile Information */}
+                            <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#e8f9f3] p-8 px-12">
+                                <h2 className="text-lg font-semibold text-black-5">Profile Information</h2>
+                                <div className="flex flex-col gap-5 lg:flex-row">
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="firstName" className="label-style">First Name</label>
+                                        <input
+                                            type="text"
+                                            id="firstName"
+                                            name="first_name"
+                                            value={teacherInfo.first_name}
+                                            placeholder="Enter first name"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="lastName" className="label-style">Last Name</label>
+                                        <input
+                                            type="text"
+                                            id="lastName"
+                                            name="last_name"
+                                            value={teacherInfo.last_name}
+                                            placeholder="Enter last name"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-5 lg:flex-row">
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="address" className="label-style">Address</label>
+                                        <input
+                                            type="text"
+                                            name="address"
+                                            id="address"
+                                            value={teacherInfo.address}
+                                            placeholder="Enter address"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="price" className="label-style">Price</label>
+                                        <input
+                                            type="text"
+                                            name="price"
+                                            id="price"
+                                            value={teacherInfo.price}
+                                            placeholder="Enter price"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Additional fields */}
+                                <div className="flex flex-col gap-5 lg:flex-row">
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="tutoringPrice" className="label-style">Tutoring Price</label>
+                                        <input
+                                            type="text"
+                                            name="tutoring_price"
+                                            id="tutoringPrice"
+                                            value={teacherInfo.tutoring_price}
+                                            placeholder="Enter tutoring price"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="dob" className="label-style">Date of Birth</label>
+                                        <input
+                                            type="date"
+                                            name="dob"
+                                            id="dob"
+                                            value={teacherInfo.dob}
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Transport Mode, Location, Status */}
+                                <div className="flex flex-col gap-5 lg:flex-row">
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="transportMode" className="label-style">Transport Mode</label>
+                                        <input
+                                            type="text"
+                                            name="transport_mode"
+                                            id="transportMode"
+                                            value={teacherInfo.transport_mode}
+                                            placeholder="Enter transport mode"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="location" className="label-style">Location</label>
+                                        <input
+                                            type="text"
+                                            name="location"
+                                            id="location"
+                                            value={teacherInfo.location}
+                                            placeholder="Enter location"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-5 lg:flex-row">
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="pinCode" className="label-style">Pin Code</label>
+                                        <input
+                                            type="text"
+                                            name="pin_code"
+                                            id="pinCode"
+                                            value={teacherInfo.pin_code}
+                                            placeholder="Enter pin code"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="status" className="label-style">Status</label>
+                                        <input
+                                            type="text"
+                                            name="status"
+                                            id="status"
+                                            // disabled
+                                            value={teacherInfo.tutor_status}
+                                            placeholder="Enter status"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                                
+
+                                <div className="flex flex-col gap-5 lg:flex-row">
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="signupType" className="label-style">Signup Type</label>
+                                        <input
+                                            type="text"
+                                            name="signup_type"
+                                            id="signupType"
+                                            value={teacherInfo.signup_type}
+                                            placeholder="Enter signup type"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="mobileType" className="label-style">Mobile Type</label>
+                                        <input
+                                            type="text"
+                                            name="mobile_type"
+                                            id="mobileType"
+                                            value={teacherInfo.mobile_type}
+                                            placeholder="Enter mobile type"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-5 lg:flex-row">
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="priceValue" className="label-style">Price Value</label>
+                                        <input
+                                            type="text"
+                                            name="price_value"
+                                            id="priceValue"
+                                            value={teacherInfo.price_value}
+                                            placeholder="Enter price value"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="tutorTypeName" className="label-style">Tutor Type Name</label>
+                                        <input
+                                            type="text"
+                                            name="tutor_type_name"
+                                            id="tutorTypeName"
+                                            value={teacherInfo.tutor_type_name}
+                                            placeholder="Enter tutor type"
+                                            className="form-style"
+                                            onChange={handleInputChange}
+                                            disabled={!editable}
+                                        />
+                                    </div>
+                                </div>
+                               
+
+                                {/* Remark */}
+                                <div className="flex flex-col lg:flex-row gap-5 lg:mt-5">
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="actionSelect" className="label-style">Action</label>
+                                        <select
+                                            id="profileAction"
+                                            value={profileAction}
+                                            onChange={handleProfileActionChange}
+                                            className="form-style"
+                                        >
+                                            <option value="">--Select Action--</option>
+                                            {statusOptionss.map((option) => (
+                                                <option key={option} value={option}>
+                                                    {option}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {profileAction === "Remark" && (
+                                        <div className="flex flex-col gap-2 lg:w-[48%]">
+                                            <label htmlFor="profileRemark" className="label-style">Remark</label>
+                                            <input
+                                                type="text"
+                                                id="profileRemark"
+                                                value={profileRemark}
+                                                onChange={handleProfileRemarkChange}
+                                                placeholder="Enter your remark"
+                                                className="form-style"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Action buttons */}
+                                <div className="flex gap-4 mt-4">
+                                    <div>
+                                        <button
+                                            type="button"
+                                            onClick={handleProfile}
+                                            className="p-2 bg-blue-500 text-white rounded-md w-32"
+                                        // disabled={!editable}
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                    <div>
+                                        {editable ? (
+                                            <button
+                                                type="button"
+                                                onClick={handleUpdate}
+                                                className="p-2 bg-blue-500 text-white rounded-md w-32"
+                                            >
+                                                Update
+                                            </button>
+                                        ) : (
+                                            <AiOutlineEdit
+                                            onClick={toggleEdit}
+                                            className="w-9 h-9 rounded-full p-1 cursor-pointer hover:text-red-800 hover:bg-red-300"
+                                            style={{
+                                                      fill: "blue", 
+                                                  }}
+                                              />
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Teacher Academic Section */}
+                            {/* <TeacherIdentifications
+                                initialData={teacherIdentifications}
+                                editable={false}
+                            /> */}
+                            
+                            <TeacherAcademic
+                                initialData={teacherAcademic}
+                                editable={false}
+                            />
+                            <TeacherEmployment
+                                initialData={teacherEmp}
+                                editable={false}
+                            />
+                            <TeacherBio
+                                initialData={teacherBio}
+                                editable={false}
+                            />
+                            <TeacherEducation
+                                initialData={teacherEdu}
+                                editable={false}
+                                userId={teacherId}
+                                teacherId={userId}
+                            />
+                            <TeacherAvailability
+                                initialData={teacherAvail}
+                                teacherId={userId}
+                            />
+                            {/* Teacher Employment Section */}
+                            {/* <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#e8f9f3] p-8 px-12">
+                                <h2 className="text-lg font-semibold text-black">Employment Information</h2>
+                                <div className="flex flex-col gap-5 lg:flex-row">
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="commitmentForYear" className="label-style">Commitment for Year</label>
+                                        <input
+                                            type="text"
+                                            id="commitmentForYear"
+                                            value={teacherEmployment.commitment_for_year}
+                                            placeholder="Enter commitment for year"
+                                            className="form-style"
+
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2 lg:w-[48%]">
+                                        <label htmlFor="capableWorkingStudents" className="label-style">Capable Working Students</label>
+                                        <input
+                                            type="number"
+                                            id="capableWorkingStudents"
+                                            value={teacherEmployment.capable_working_students}
+                                            placeholder="Enter number of students"
+                                            className="form-style"
+
+                                        />
+                                    </div>
+                                </div>
+                            </div> */}
+                        </form>
+                        <div className="mt-4 p-6 bg-gray-100 rounded-md">
+                            <h2 className="text-lg font-semibold mb-4">Change Tutor Status</h2>
+                            <form
+                                onSubmit={handleTutorSubmit}
+                                className="flex justify-between items-center gap-4"
+                            >
+                                <div className="flex flex-col">
+                                    <label className="block font-medium">Status</label>
+                                    <select
+                                        value={tutorstatus}
+                                        onChange={(e) => setTutorStatus(e.target.value)}
+                                        className="form-style p-2 border rounded-md"
+                                        required
+                                    >
+                                        <option value="">--Select Status--</option>
+                                        <option value="profile incomplete">Profile Incomplete</option>
+                                        <option value="pending activation">Pending Activation</option>
+                                        <option value="active">Active</option>
+                                        <option value="suspended">Suspended</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+
+                                </div>
+                                <div><button
+                                    type="submit"
+                                    className="p-2 bg-blue-500 text-white rounded-md"
+                                >
+                                    Submit
+                                </button></div>
+
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+
+            </main>
+        </div>
+    );
+}
