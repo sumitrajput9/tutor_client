@@ -81,7 +81,7 @@ export function TeacherAvailability({ initialData, teacherId }) {
             formData.append("travel_time",availability.travel_time);
     
             await axios.post(
-                `https://testapi.tutorgator.com.au/update_slot`,
+                `${process.env.REACT_APP_API_BASE_URL}/update_slot`,
                 formData,
                 {
                     headers: {
@@ -137,7 +137,7 @@ export function TeacherAvailability({ initialData, teacherId }) {
             );
     
             const response = await axios.post(
-                "https://testapi.tutorgator.com.au/teacher_update_availability",
+                `${process.env.REACT_APP_API_BASE_URL}/teacher_update_availability`,
                 formData,
                 {
                     headers: {
@@ -180,13 +180,13 @@ export function TeacherAvailability({ initialData, teacherId }) {
     const displayedData = showAll ? availabilityData : availabilityData.slice(0, 2);
 
     return (
-        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-gray-300 bg-[#e8f9f3] p-6">
-            <h2 className="text-lg font-semibold">Teacher Availability</h2>
+        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-gray-300 bg-[#2C8E71] p-6">
+            <h2 className="text-lg font-semibold text-white">Teacher Availability</h2>
 
             {displayedData.map((availability, index) => (
-                <div key={availability.id} className="flex flex-col gap-4 p-4 border rounded-md bg-[#e8f9f3]">
+                <div key={availability.id} className="flex flex-col gap-4 p-4 border rounded-md bg-[#2C8E71]">
                     <div className="flex flex-col gap-2">
-                        <label className="label-style">Dates</label>
+                        <label className="label-style text-white">Dates</label>
                         <input
                             type="text"
                             name="date"
@@ -198,7 +198,7 @@ export function TeacherAvailability({ initialData, teacherId }) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <label className="label-style">Days</label>
+                        <label className="label-style text-white">Days</label>
                         <input
                             type="text"
                             name="day"
@@ -212,7 +212,7 @@ export function TeacherAvailability({ initialData, teacherId }) {
                     {availability.slot.map((slot, slotIndex) => (
                         <div key={slot.id} className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
-                                <label className="label-style">Start Time</label>
+                                <label className="label-style text-white">Start Time</label>
                                 <input
                                     type="time"
                                     name="start_time"
@@ -223,7 +223,7 @@ export function TeacherAvailability({ initialData, teacherId }) {
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <label className="label-style">End Time</label>
+                                <label className="label-style text-white">End Time</label>
                                 <input
                                     type="time"
                                     name="end_time"
@@ -234,7 +234,7 @@ export function TeacherAvailability({ initialData, teacherId }) {
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <label className="label-style">Availability</label>
+                                <label className="label-style text-white">Availability</label>
                                 <select
                                     name="availability"
                                     value={slot.availability}
@@ -266,7 +266,7 @@ export function TeacherAvailability({ initialData, teacherId }) {
                     {/* <h3 className="text-lg font-semibold">Add New Slot</h3> */}
                     <div  className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-2">
-                        <label className="label-style">Date</label>
+                        <label className="label-style text-white">Date</label>
                         <input
                             type="date"
                             value={newSlot.date}
@@ -276,7 +276,7 @@ export function TeacherAvailability({ initialData, teacherId }) {
                           </div>
                   
                     <div className="flex flex-col gap-2">
-                        <label className="label-style">Day</label>
+                        <label className="label-style text-white">Day</label>
                         <input
                             type="text"
                             placeholder="Enter day (e.g., Monday)"

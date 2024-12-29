@@ -7,9 +7,9 @@ function LandingPage() {
     console.log(role);
     
     if (role === "Tutor") {
-      navigate("/dashboard")
+      navigate("/dashboard/profile-approval")
     } else if (role === "Parent") {
-      navigate("/parent-dashboard")
+      navigate("/dashboard/parent/profile")
     }
   }
 

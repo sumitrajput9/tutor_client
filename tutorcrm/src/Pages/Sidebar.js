@@ -12,7 +12,7 @@ export default function Sidebar() {
         navigate('/login')
     }
     return (
-        <div className="fixed top-0 left-0  flex h-[calc(100vh-3.5rem)] bg-[#e8f9f3] min-w-[220px] max-w-[250px] flex-col border-r-[1px] border-r-gray-700 bg-gray-800 py-10">
+        <div className="fixed top-0 left-0  flex h-[calc(100vh-3.5rem)] bg-[#E8F9F4] min-w-[220px] max-w-[250px] flex-col border-r-[1px] border-r-gray-700 bg-gray-800 py-10">
             {/* Role Selection */}
             <div className="flex justify-center mb-4">
                 <button
@@ -34,8 +34,8 @@ export default function Sidebar() {
             <div className="flex flex-col">
                 {role === "Tutor" ? (
                     <>
-                        <NavLink
-                            to="/dashboard/homme"
+                        {/* <NavLink
+                            to="/dashboard/home"
                             className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
                             onClick={() => console.log("Resetting course state...")}
                         >
@@ -43,7 +43,7 @@ export default function Sidebar() {
                                 <VscDashboard className="text-lg" />
                                 <span>Dashboard</span>
                             </div>
-                        </NavLink>
+                        </NavLink> */}
                         <NavLink
                             to="/dashboard/profile-approval"
                             className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
@@ -56,7 +56,7 @@ export default function Sidebar() {
                             </div>
                         </NavLink>
                         <NavLink
-                            to="/dashboard/payout"
+                            to="/dashboard/tutor/payout"
                             className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
                             onClick={() => console.log("Resetting course state...")}
                         >
@@ -68,7 +68,6 @@ export default function Sidebar() {
                         <NavLink
                             to="/dashboard/notifications"
                             className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
-                            onClick={() => console.log("Resetting course state...")}
                         >
                             <div className="flex items-center gap-x-2">
                                 <VscBook className="text-lg" />
@@ -86,7 +85,7 @@ export default function Sidebar() {
                             </div>
                         </NavLink>
                         <NavLink
-                            to="/dashboard/login-as"
+                            to="/dashboard/tutor/login-as"
                             className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
                             onClick={() => console.log("Resetting course state...")}
                         >
@@ -98,7 +97,7 @@ export default function Sidebar() {
                     </>
                 ) : (
                     <>
-                        <NavLink
+                        {/* <NavLink
                             to="/dashboard"
                             className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
                             onClick={() => console.log("Resetting course state...")}
@@ -107,7 +106,7 @@ export default function Sidebar() {
                                 <VscDashboard className="text-lg" />
                                 <span>Dashboard</span>
                             </div>
-                        </NavLink>
+                        </NavLink> */}
                         <NavLink
                             to="/dashboard/parent/profile"
                             className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
@@ -129,7 +128,7 @@ export default function Sidebar() {
                             </div>
                         </NavLink>
                         <NavLink
-                            to="/dashboard/parent/notifications"
+                            to="/dashboard/client/notifications"
                             className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
                             onClick={() => console.log("Resetting course state...")}
                         >
@@ -146,6 +145,16 @@ export default function Sidebar() {
                             <div className="flex items-center gap-x-2">
                                 <VscAccount className="text-lg" />
                                 <span>Reports</span>
+                            </div>
+                        </NavLink>
+                        <NavLink
+                            to="/dashboard/client/login-as"
+                            className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
+                            onClick={() => console.log("Resetting course state...")}
+                        >
+                            <div className="flex items-center gap-x-2">
+                                <VscAccount className="text-lg" />
+                                <span>Login-as</span>
                             </div>
                         </NavLink>
                     </>

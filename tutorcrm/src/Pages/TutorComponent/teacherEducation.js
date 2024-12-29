@@ -8,7 +8,8 @@ export function TeacherEducation({ initialData, teacherId, userId }) {
     const [educationData, setEducationData] = useState(initialData || []);
     const [academicActions, setAcademicActions] = useState('');
     const [editable, setEditable] = useState(false);
-    const statusOptions = ["Approve", "Reject", "Remark"];
+    const statusOptions = ["Approve", "Reject"];
+    const [remark, setRemark] = useState('');
     const token = localStorage.getItem("token") || "";
     console.log(initialData, "initialData");
 
@@ -29,6 +30,9 @@ export function TeacherEducation({ initialData, teacherId, userId }) {
         }
     };
 
+    const handleRemark=(e)=>{
+        setRemark(e.target.value)
+    }
     const handleUpdate = async () => {
         try {
             const formData = new FormData();
@@ -53,7 +57,7 @@ export function TeacherEducation({ initialData, teacherId, userId }) {
             formData.append("teacher_id", teacherId);
 
             const response = await axios.post(
-                "https://testapi.tutorgator.com.au/teacher_update_education",
+                `${process.env.REACT_APP_API_BASE_URL}/teacher_update_education`,
                 formData,
                 {
                     headers: {
@@ -92,7 +96,7 @@ export function TeacherEducation({ initialData, teacherId, userId }) {
         formData.append('remark', academicActions === "Remark" ? '' : '');
         formData.append('editable', "false");
         try {
-            const response = await fetch('https://testapi.tutorgator.com.au/cms_tutor_education', {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cms_tutor_education`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -123,8 +127,8 @@ export function TeacherEducation({ initialData, teacherId, userId }) {
     };
 
     return (
-        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#e8f9f3] p-8 px-12">
-            <h2 className="text-lg font-semibold text-black">Teacher Education</h2>
+        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#2C8E71] p-8 px-12">
+            <h2 className="text-lg font-semibold text-white">Teacher Education</h2>
 
             {educationData?.map((entry, index) => (
                 <div key={entry.id} className="border-b-2 border-gray-200 pb-6 mb-6">
@@ -138,11 +142,10 @@ export function TeacherEducation({ initialData, teacherId, userId }) {
                             { label: "Degree Name", name: "name" },
                             { label: "Document ID", name: "document_id" },
                             { label: "Tutor Status", name: "tutor_status" },
-                            { label: "Remark", name: "remark" },
                             { label: "Education Level", name: "education_level_name" },
                         ].map((field) => (
                             <div key={field.name} className="flex flex-col gap-2">
-                                <label className="label-style">{field.label}</label>
+                                <label className="label-style text-white">{field.label}</label>
                                 <input
                                     type="text"
                                     name={field.name}
@@ -156,7 +159,7 @@ export function TeacherEducation({ initialData, teacherId, userId }) {
 
                         {/* Display document image */}
                         <div className="flex flex-col gap-2 col-span-2">
-                            <label className="label-style">Document Image</label>
+                            <label className="label-style text-white">Document Image</label>
                             <img
                                 src={entry.document_image}
                                 alt="Document"
@@ -166,7 +169,7 @@ export function TeacherEducation({ initialData, teacherId, userId }) {
 
                         {/* Dropdown for actions */}
                         <div className="flex flex-col gap-2 col-span-2">
-                            <label className="label-style">Academic Action</label>
+                            <label className="label-style text-white">Academic Action</label>
                             <select
                                 value={academicActions}
                                 onChange={(e) => handleAcademicActionChange(e, index)}
@@ -182,19 +185,20 @@ export function TeacherEducation({ initialData, teacherId, userId }) {
                             </select>
 
                             {/* Remark field, displayed only when "Remark" is selected */}
-                            {academicActions[index] === "Remark" && (
+                            {/* {academicActions[index] === "Remark" && ( */}
                                 <div className="flex flex-col gap-2 col-span-2">
-                                    <label className="label-style">Academic Remark</label>
+                                    <label className="label-style text-white">Academic Remark</label>
                                     <input
                                         type="text"
                                         name="remark"
                                         value={entry.remark || ""}
-                                        onChange={(e) => handleInputChange(e, index)}
+                                        onChange={(e) => handleRemark(e, index)}
                                         placeholder="Enter remark"
                                         className="form-style"
+                                        disabled={!entry.editable}
                                     />
                                 </div>
-                            )}
+                            {/* )} */}
                         </div>
 
                         {/* Toggle edit and update buttons */}

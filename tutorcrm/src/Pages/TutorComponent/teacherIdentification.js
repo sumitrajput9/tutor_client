@@ -61,7 +61,7 @@ export function TeacherIdentifications({ initialData, editable }) {
         setProfileRemark(e.target.value);
     };
     return (
-        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#e8f9f3] p-8 px-12">
+        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#2C8E71] p-8 px-12">
             <h2 className="text-lg font-semibold text-black">Teacher Identifications</h2>
 
             <div className="flex flex-col gap-4">

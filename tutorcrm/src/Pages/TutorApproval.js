@@ -26,7 +26,7 @@ export default function TutorApproval() {
     const [teacherBio, setTeacherBio] = useState([]);
     const [teacherEdu, setTeacherEdu] = useState([]);
     const [teacherAvail, setTeacherAvail] = useState([]);
-    const [statusOptionss] = useState(["Approve", "Reject", "Remark"]);
+    const [statusOptionss] = useState(["Approve", "Reject"]);
 
     const [profileAction, setProfileAction] = useState('');
     const [profileRemark, setProfileRemark] = useState('');
@@ -47,7 +47,7 @@ export default function TutorApproval() {
     useEffect(() => {
         const fetchTutors = async () => {
             try {
-                const response = await axios.post('https://testapi.tutorgator.com.au/get_users', {}, {
+                const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/get_users`, {}, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     },
@@ -68,7 +68,7 @@ export default function TutorApproval() {
         try {
           setShowButtons(false);
             const response = await axios.post(
-                'https://testapi.tutorgator.com.au/get_teacher_info',
+                `${process.env.REACT_APP_API_BASE_URL}/get_teacher_info`,
                 { teacher_id: teacherId }, // Data payload
                 { // Third parameter for config
                     headers: {
@@ -82,7 +82,7 @@ export default function TutorApproval() {
                 setTeacherId(response?.data?.data?.teacher_info?.id)
                 console.log(response?.data?.data ,"response?.data?.data?.teacher_info?.id ");
                 
-                const data = await axios.post('https://testapi.tutorgator.com.au/get_teacher_info_by_user_id', { user_id: response?.data?.data?.teacher_info?.id }, // Data payload
+                const data = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/get_teacher_info_by_user_id`, { user_id: response?.data?.data?.teacher_info?.id }, // Data payload
                     { // Third parameter for config
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -130,7 +130,7 @@ export default function TutorApproval() {
         formData.append("editable", "false");
         try {
             const response = await axios.post(
-                'https://testapi.tutorgator.com.au/cms_tutor_profile',
+                `${process.env.REACT_APP_API_BASE_URL}/cms_tutor_profile`,
                 formData,
                 {
                     headers: {
@@ -187,14 +187,6 @@ export default function TutorApproval() {
         }
     };
 
-
-    const handleAcademicActionChange = (e) => {
-        setAcademicAction(e.target.value);
-        if (e.target.value !== "Remark") {
-            setAcademicRemark(''); // Clear remark if action is not "Remark"
-        }
-    };
-
     const handleProfileRemarkChange = (e) => {
         setProfileRemark(e.target.value);
     };
@@ -235,7 +227,7 @@ export default function TutorApproval() {
         formData.append('editable', "false"); // Set editable to "false" as required
 
         try {
-            const response = await fetch('https://testapi.tutorgator.com.au/cms_tutor_profile', {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cms_tutor_profile`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -247,7 +239,7 @@ export default function TutorApproval() {
                 const data = await response.json();
             toast.success('Profile updated successfully');
                 if (data.data === null) {
-                    const updatedProfile = await axios.post('https://testapi.tutorgator.com.au/get_teacher_info_by_user_id', { user_id: teacherId }, // Data payload
+                    const updatedProfile = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/get_teacher_info_by_user_id`, { user_id: teacherId }, // Data payload
                         { // Third parameter for config
                             headers: {
                                 Authorization: `Bearer ${token}`
@@ -283,7 +275,7 @@ export default function TutorApproval() {
         });
         try {
             const response = await axios.post(
-                'https://testapi.tutorgator.com.au/teacher_update_profile',
+                    `${process.env.REACT_APP_API_BASE_URL}/teacher_update_profile`,
                 formData,
                 {
                     headers: {
@@ -305,16 +297,29 @@ export default function TutorApproval() {
     const handleTutorSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(
-                "https://testapi.tutorgator.com.au/cms_tutor_status_change",
-                { teacher_id: userId, status:tutorstatus },
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
+             if(tutorstatus==='active'){
+                const response = await axios.post(
+                    `${process.env.REACT_APP_API_BASE_URL}/cms_tutor_status_change`,
+                    { teacher_id: userId, status:tutorstatus },
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+             }else{
+                const response = await axios.post(
+                    `${process.env.REACT_APP_API_BASE_URL}/cms_tutor_status_change`,
+                    { teacher_id: userId, status:tutorstatus },
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+             }
             alert("Tutor status updated successfully!");
         } catch (error) {
             console.error("Error updating status:", error);
@@ -331,7 +336,7 @@ export default function TutorApproval() {
     return (
         <div className="flex flex-col">
             {/* Header */}
-            <header className="bg-[#e8f9f3] text-white p-4 m-0">
+            <header className="bg-[#2C8E71] text-white p-4 m-0">
                 <h1 className="text-xl font-bold text-black">Tutor Approval</h1>
             </header>
             {/* Main Content */}
@@ -380,7 +385,7 @@ export default function TutorApproval() {
                             {filteredTutors.map((tutor) => (
                                 <button
                                     key={tutor.id}
-                                    className="p-3 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition"
+                                    className="p-3 bg-[#2C8E71] text-white rounded-md shadow hover:bg-blue-600 transition"
                                     onClick={() => handleTutorSelect(tutor.id)}
                                 >
                                     {tutor.first_name} {tutor.last_name}
@@ -394,11 +399,11 @@ export default function TutorApproval() {
                         <h3 className="font-bold">Tutor Details</h3>
                         <form onSubmit={handleSubmit}>
                             {/* Profile Information */}
-                            <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#e8f9f3] p-8 px-12">
-                                <h2 className="text-lg font-semibold text-black-5">Profile Information</h2>
+                            <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#2C8E71] p-8 px-12">
+                                <h2 className="text-lg font-semibold text-white me-2">Profile Information</h2>
                                 <div className="flex flex-col gap-5 lg:flex-row">
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="firstName" className="label-style">First Name</label>
+                                        <label htmlFor="firstName" className="label-style text-white">First Name</label>
                                         <input
                                             type="text"
                                             id="firstName"
@@ -411,7 +416,7 @@ export default function TutorApproval() {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="lastName" className="label-style">Last Name</label>
+                                        <label htmlFor="lastName" className="label-style text-white">Last Name</label>
                                         <input
                                             type="text"
                                             id="lastName"
@@ -426,7 +431,7 @@ export default function TutorApproval() {
                                 </div>
                                 <div className="flex flex-col gap-5 lg:flex-row">
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="address" className="label-style">Address</label>
+                                        <label htmlFor="address" className="label-style text-white">Address</label>
                                         <input
                                             type="text"
                                             name="address"
@@ -439,7 +444,7 @@ export default function TutorApproval() {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="price" className="label-style">Price</label>
+                                        <label htmlFor="price" className="label-style text-white">Price</label>
                                         <input
                                             type="text"
                                             name="price"
@@ -456,7 +461,7 @@ export default function TutorApproval() {
                                 {/* Additional fields */}
                                 <div className="flex flex-col gap-5 lg:flex-row">
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="tutoringPrice" className="label-style">Tutoring Price</label>
+                                        <label htmlFor="tutoringPrice" className="label-style text-white">Tutoring Price</label>
                                         <input
                                             type="text"
                                             name="tutoring_price"
@@ -469,7 +474,7 @@ export default function TutorApproval() {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="dob" className="label-style">Date of Birth</label>
+                                        <label htmlFor="dob" className="label-style text-white">Date of Birth</label>
                                         <input
                                             type="date"
                                             name="dob"
@@ -485,7 +490,7 @@ export default function TutorApproval() {
                                 {/* Transport Mode, Location, Status */}
                                 <div className="flex flex-col gap-5 lg:flex-row">
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="transportMode" className="label-style">Transport Mode</label>
+                                        <label htmlFor="transportMode" className="label-style text-white">Transport Mode</label>
                                         <input
                                             type="text"
                                             name="transport_mode"
@@ -498,7 +503,7 @@ export default function TutorApproval() {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="location" className="label-style">Location</label>
+                                        <label htmlFor="location" className="label-style text-white">Location</label>
                                         <input
                                             type="text"
                                             name="location"
@@ -513,7 +518,7 @@ export default function TutorApproval() {
                                 </div>
                                 <div className="flex flex-col gap-5 lg:flex-row">
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="pinCode" className="label-style">Pin Code</label>
+                                        <label htmlFor="pinCode" className="label-style text-white">Pin Code</label>
                                         <input
                                             type="text"
                                             name="pin_code"
@@ -526,7 +531,7 @@ export default function TutorApproval() {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="status" className="label-style">Status</label>
+                                        <label htmlFor="status" className="label-style text-white">Status</label>
                                         <input
                                             type="text"
                                             name="status"
@@ -544,7 +549,7 @@ export default function TutorApproval() {
 
                                 <div className="flex flex-col gap-5 lg:flex-row">
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="signupType" className="label-style">Signup Type</label>
+                                        <label htmlFor="signupType" className="label-style text-white">Signup Type</label>
                                         <input
                                             type="text"
                                             name="signup_type"
@@ -557,7 +562,7 @@ export default function TutorApproval() {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="mobileType" className="label-style">Mobile Type</label>
+                                        <label htmlFor="mobileType" className="label-style text-white">Mobile Type</label>
                                         <input
                                             type="text"
                                             name="mobile_type"
@@ -573,7 +578,7 @@ export default function TutorApproval() {
 
                                 <div className="flex flex-col gap-5 lg:flex-row">
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="priceValue" className="label-style">Price Value</label>
+                                        <label htmlFor="priceValue" className="label-style text-white">Price Value</label>
                                         <input
                                             type="text"
                                             name="price_value"
@@ -586,7 +591,7 @@ export default function TutorApproval() {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="tutorTypeName" className="label-style">Tutor Type Name</label>
+                                        <label htmlFor="tutorTypeName" className="label-style text-white">Tutor Type Name</label>
                                         <input
                                             type="text"
                                             name="tutor_type_name"
@@ -604,7 +609,7 @@ export default function TutorApproval() {
                                 {/* Remark */}
                                 <div className="flex flex-col lg:flex-row gap-5 lg:mt-5">
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="actionSelect" className="label-style">Action</label>
+                                        <label htmlFor="actionSelect" className="label-style text-white">Action</label>
                                         <select
                                             id="profileAction"
                                             value={profileAction}
@@ -619,9 +624,9 @@ export default function TutorApproval() {
                                             ))}
                                         </select>
                                     </div>
-                                    {profileAction === "Remark" && (
+                                    
                                         <div className="flex flex-col gap-2 lg:w-[48%]">
-                                            <label htmlFor="profileRemark" className="label-style">Remark</label>
+                                            <label htmlFor="profileRemark" className="label-style text-white">Remark</label>
                                             <input
                                                 type="text"
                                                 id="profileRemark"
@@ -631,7 +636,6 @@ export default function TutorApproval() {
                                                 className="form-style"
                                             />
                                         </div>
-                                    )}
                                 </div>
 
                                 {/* Action buttons */}
@@ -701,7 +705,7 @@ export default function TutorApproval() {
                                 <h2 className="text-lg font-semibold text-black">Employment Information</h2>
                                 <div className="flex flex-col gap-5 lg:flex-row">
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="commitmentForYear" className="label-style">Commitment for Year</label>
+                                        <label htmlFor="commitmentForYear" className="label-style text-white">Commitment for Year</label>
                                         <input
                                             type="text"
                                             id="commitmentForYear"
@@ -712,7 +716,7 @@ export default function TutorApproval() {
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 lg:w-[48%]">
-                                        <label htmlFor="capableWorkingStudents" className="label-style">Capable Working Students</label>
+                                        <label htmlFor="capableWorkingStudents" className="label-style text-white">Capable Working Students</label>
                                         <input
                                             type="number"
                                             id="capableWorkingStudents"

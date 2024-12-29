@@ -12,7 +12,7 @@ export function TeacherAcademic({ initialData }) {
     const [academicAction, setAcademicAction] = useState("");
     const [academicRemark, setAcademicRemark] = useState("");
     const [editable, setEditable] = useState(false);
-    const [statusOptions] = useState(["Approve", "Reject", "Remark"]);
+    const [statusOptions] = useState(["Approve", "Reject"]);
     const token = localStorage.getItem('token') || '';
 
 
@@ -60,11 +60,11 @@ export function TeacherAcademic({ initialData }) {
         // Add data to FormData
         formData.append('teacher_id', teacherAcademic.teacher_id);
         formData.append('tutor_status', teacherAction);
-        formData.append('remark', academicAction === "Remark" ? academicRemark : '');
+        formData.append('remark', academicRemark ? academicRemark : '');
         formData.append('editable', "false");
 
         try {
-            const response = await fetch('https://testapi.tutorgator.com.au/cms_tutor_academic', {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cms_tutor_academic`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -96,7 +96,7 @@ export function TeacherAcademic({ initialData }) {
         e.preventDefault();
         try {
             const response = await axios.post(
-                `https://testapi.tutorgator.com.au/teacher_update_academic`,
+                `${process.env.REACT_APP_API_BASE_URL}/teacher_update_academic`,
                 teacherAcademic,
                 {
                     headers: {
@@ -121,8 +121,8 @@ export function TeacherAcademic({ initialData }) {
     };
 
     return (
-        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#e8f9f3] p-8 px-12">
-            <h2 className="text-lg font-semibold text-black">Teacher Academic</h2>
+        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#2C8E71] p-8 px-12">
+            <h2 className="text-lg font-semibold text-white">Teacher Academic</h2>
 
             <div className="grid grid-cols-2 gap-6">
                 {/* Fields for each data point */}
@@ -139,7 +139,7 @@ export function TeacherAcademic({ initialData }) {
                     { label: "Remark", name: "remark" }
                 ].map((field) => (
                     <div key={field.name} className="flex flex-col gap-2">
-                        <label className="label-style">{field.label}</label>
+                        <label className="label-style text-white">{field.label}</label>
                         <input
                             type="text"
                             name={field.name}
@@ -178,7 +178,7 @@ export function TeacherAcademic({ initialData }) {
 
                 {/* Dropdown for actions */}
                 <div className="flex flex-col gap-2 col-span-2">
-                    <label className="label-style">Academic Action</label>
+                    <label className="label-style text-white">Academic Action</label>
                     <select
                         value={academicAction}
                         onChange={handleAcademicActionChange}
@@ -193,10 +193,11 @@ export function TeacherAcademic({ initialData }) {
                         ))}
                     </select>
 
-                    {/* Remark field, displayed only when "Remark" is selected */}
-                    {academicAction === "Remark" && (
+                    {/* Remark field, displayed only when "Remark" is selected 
+                   
+                    {academicAction === "Remark" && (*/}
                         <div className="flex flex-col gap-2 col-span-2">
-                            <label className="label-style">Academic Remark</label>
+                            <label className="label-style text-white">Academic Remark</label>
                             <input
                                 type="text"
                                 value={academicRemark}
@@ -205,7 +206,7 @@ export function TeacherAcademic({ initialData }) {
                                 className="form-style"
                             />
                         </div>
-                    )}
+                   {/* )} */}
                 </div>
 
                 {/* Toggle edit and update buttons */}

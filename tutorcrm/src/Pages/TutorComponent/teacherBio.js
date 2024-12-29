@@ -7,8 +7,8 @@ export function TeacherBio({ initialData }) {
     const [teacherBio, setTeacherBio] = useState(initialData || {});
     const [academicAction, setAcademicAction] = useState("");
     const [academicRemark, setAcademicRemark] = useState("");
-    const [statusOptions] = useState(["Approve", "Reject", "Remark"]);
-    const API_URL = "https://testapi.tutorgator.com.au/teacher_update_bio";
+    const [statusOptions] = useState(["Approve", "Reject"]);
+    const API_URL = `${process.env.REACT_APP_API_URL}/teacher_update_bio`;
     const token = localStorage.getItem("token") || "";
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -49,7 +49,7 @@ export function TeacherBio({ initialData }) {
             formData.append('tutor_status', status);
             formData.append('remark', academicRemark);
             formData.append('editable', "false");
-            const response = await fetch('https://testapi.tutorgator.com.au/cms_tutor_bio', {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cms_tutor_bio`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -99,13 +99,13 @@ export function TeacherBio({ initialData }) {
     };
 
     return (
-        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#e8f9f3] p-8 px-12">
-            <h2 className="text-lg font-semibold text-black">Teacher Bio</h2>
+        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#2C8E71] p-8 px-12">
+            <h2 className="text-lg font-semibold text-white">Teacher Bio</h2>
 
             <div className="grid grid-cols-2 gap-6">
                 {[{ label: "Brief Bio", name: "brief_bio" }, { label: "Detailed Bio", name: "detailed_bio" }, { label: "Tutor Status", name: "tutor_status" }, { label: "Remark", name: "remark" }].map((field) => (
                     <div key={field.name} className="flex flex-col gap-2">
-                        <label className="label-style">{field.label}</label>
+                        <label className="label-style text-white" style={{ color: "white" }}>{field.label}</label>
                         <input
                             type="text"
                             name={field.name}
@@ -118,7 +118,7 @@ export function TeacherBio({ initialData }) {
                 ))}
 
                 <div className="flex flex-col gap-2 col-span-2">
-                    <label className="label-style">Academic Action</label>
+                    <label className="label-style text-white">Academic Action</label>
                     <select
                         value={academicAction}
                         onChange={handleAcademicActionChange}
@@ -134,18 +134,19 @@ export function TeacherBio({ initialData }) {
                     </select>
                 </div>
 
-                {academicAction === "Remark" && (
+                {/* {academicAction === "Remark" && ( */}
                     <div className="flex flex-col gap-2 col-span-2">
-                        <label className="label-style">Academic Remark</label>
+                        <label className="label-style text-white">Academic Remark</label>
                         <input
                             type="text"
                             value={academicRemark}
                             onChange={handleAcademicRemarkChange}
                             placeholder="Enter remark"
                             className="form-style"
+                            disabled={!teacherBio.editable}
                         />
                     </div>
-                )}
+                {/* )} */}
 
                 <div className="flex gap-4 mt-4">
 

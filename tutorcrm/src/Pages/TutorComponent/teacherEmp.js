@@ -8,7 +8,7 @@ export function TeacherEmployment({ initialData, editable }) {
     const [teacherEmployment, setTeacherEmployment] = useState(initialData || {});
     const [employmentAction, setEmploymentAction] = useState("");
     const [employmentRemark, setEmploymentRemark] = useState("");
-    const [statusOptions] = useState(["Approve", "Reject", "Remark"]);
+    const [statusOptions] = useState(["Approve", "Reject"]);
     const token = localStorage.getItem("token") || "";
 
     const handleInputChange = (e) => {
@@ -48,7 +48,7 @@ export function TeacherEmployment({ initialData, editable }) {
         formData.append('editable', "false");
 
         try {
-            const response = await fetch('https://testapi.tutorgator.com.au/cms_tutor_employment', {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cms_tutor_employment`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -96,7 +96,7 @@ export function TeacherEmployment({ initialData, editable }) {
             formData.append("user_id", teacherEmployment.user_id);
 
             const response = await axios.post(
-                "https://testapi.tutorgator.com.au/teacher_update_employment",
+                `${process.env.REACT_APP_API_BASE_URL}/teacher_update_employment`,
                 formData,
                 {
                     headers: {
@@ -117,9 +117,9 @@ export function TeacherEmployment({ initialData, editable }) {
     };
 
     return (
-        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#e8f9f3]  p-8 px-12">
+        <div className="my-4 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-[#2C8E71]  p-8 px-12">
             <ToastContainer />
-            <h2 className="text-lg font-semibold text-black">Teacher Employment</h2>
+            <h2 className="text-lg font-semibold text-white">Teacher Employment</h2>
 
             <div className="grid grid-cols-2 gap-6">
                 {[ // Fields for each data point
@@ -135,7 +135,7 @@ export function TeacherEmployment({ initialData, editable }) {
                     { label: "Remark", name: "remark" },
                 ].map((field) => (
                     <div key={field.name} className="flex flex-col gap-2">
-                        <label className="label-style">{field.label}</label>
+                        <label className="label-style text-whte" style={{ color: "white" }}>{field.label}</label>
                         <input
                             type="text"
                             name={field.name}
@@ -149,7 +149,7 @@ export function TeacherEmployment({ initialData, editable }) {
 
                 {/* Additional fields */}
                 <div className="flex flex-col gap-2">
-                    <label className="label-style">Class Names</label>
+                    <label className="label-style text-whte" style={{ color: "white" }}>Class Names</label>
                     <input
                         type="text"
                         name="class_names"
@@ -161,7 +161,7 @@ export function TeacherEmployment({ initialData, editable }) {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <label className="label-style">Subject Names</label>
+                    <label className="label-style text-whte" style={{ color: "white" }}>Subject Names</label>
                     <input
                         type="text"
                         name="subject_names"
@@ -174,7 +174,7 @@ export function TeacherEmployment({ initialData, editable }) {
 
                 {/* Dropdown for actions */}
                 <div className="flex flex-col gap-2 col-span-2">
-                    <label className="label-style">Employment Action</label>
+                    <label className="label-style text-whte" style={{ color: "white" }}>Employment Action</label>
                     <select
                         value={employmentAction}
                         onChange={handleEmploymentActionChange}
@@ -191,9 +191,9 @@ export function TeacherEmployment({ initialData, editable }) {
                 </div>
 
                 {/* Remark field */}
-                {employmentAction === "Remark" && (
+                {/* {employmentAction === "Remark" && ( */}
                     <div className="flex flex-col gap-2 col-span-2">
-                        <label className="label-style">Employment Remark</label>
+                        <label className="label-style text-whte" style={{ color: "white" }}>Employment Remark</label>
                         <input
                             type="text"
                             value={employmentRemark}
@@ -202,7 +202,7 @@ export function TeacherEmployment({ initialData, editable }) {
                             className="form-style"
                         />
                     </div>
-                )}
+                {/* )} */}
             </div>
 
             {/* Buttons */}
