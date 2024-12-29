@@ -337,11 +337,11 @@ export default function TutorApproval() {
         <div className="flex flex-col">
             {/* Header */}
             <header className="bg-[#2C8E71] text-white p-4 m-0">
-                <h1 className="text-xl font-bold text-black">Tutor Approval</h1>
+                <h1 className="text-xl font-bold text-White">Tutor Approval</h1>
             </header>
             {/* Main Content */}
             <main className="p-4">
-                <h2>Welcome to the Tutor Dashboard</h2>
+                <h2 className='text-xl font-bold text-[#2C8E71]'>Welcome to the Tutor Profile</h2>
                 <div className='flex'>
                     <div>
                         <label htmlFor="statusSelect" className="block mb-2">Select Status:</label>

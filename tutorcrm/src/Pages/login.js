@@ -29,7 +29,7 @@ function LoginForm() {
 
             if (data.success) {
                 localStorage.setItem('token',data?.data?.remember_token)
-                navigate('/dashboard');
+                navigate('/dashboard/profile-approval');
             }
         } catch (error) {
             console.error('Login failed:', error);

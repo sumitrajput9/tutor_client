@@ -1,3 +1,4 @@
+import { Login, LoginOutlined, NotificationImportantOutlined, PaymentOutlined, Report, ReportProblemOutlined } from "@mui/icons-material";
 import { useState } from "react";
 import { VscSignOut, VscSettingsGear, VscDashboard, VscBook, VscAccount } from "react-icons/vsc";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -11,19 +12,30 @@ export default function Sidebar() {
         localStorage.clear();
         navigate('/login')
     }
+    const handleRole = (role) => {
+        if (role === "Tutor") {
+            setRole(role);
+            navigate("/dashboard/profile-approval")
+        } else if (role === "Parent") {
+            setRole(role);
+            navigate("/dashboard/parent/profile")
+        }
+
+
+    };
     return (
         <div className="fixed top-0 left-0  flex h-[calc(100vh-3.5rem)] bg-[#E8F9F4] min-w-[220px] max-w-[250px] flex-col border-r-[1px] border-r-gray-700 bg-gray-800 py-10">
             {/* Role Selection */}
             <div className="flex justify-center mb-4">
                 <button
-                    onClick={() => setRole("Tutor")}
-                    className={`px-4 py-2 ${role === "Tutor" ? "bg-blue-600 text-white" : "bg-gray-600 text-white"}`}
+                    onClick={() => handleRole("Tutor")}
+                    className={`px-4 py-2 ${role === "Tutor" ? "bg-blue-600 text-white" : " text-black font-bold"}`}
                 >
                     Tutor
                 </button>
                 <button
-                    onClick={() => setRole("Parent")}
-                    className={`ml-2 px-4 py-2 ${role === "Parent" ? "bg-blue-600 text-white" : "bg-gray-600 text-white"}`}
+                    onClick={() => handleRole("Parent")}
+                    className={`ml-2 px-4 py-2 ${role === "Parent" ? "bg-blue-600 text-white" : "text-black font-bold"}`}
                 >
                     Parent
                 </button>
@@ -50,7 +62,7 @@ export default function Sidebar() {
                             onClick={() => console.log("Resetting course state...")}
                         >
                             <div className="flex items-center gap-x-2">
-                                <VscBook className="text-lg" />
+                                <VscAccount className="text-lg" />
                                 <span>Profile & Approval
                                 </span>
                             </div>
@@ -61,7 +73,7 @@ export default function Sidebar() {
                             onClick={() => console.log("Resetting course state...")}
                         >
                             <div className="flex items-center gap-x-2">
-                                <VscBook className="text-lg" />
+                                <PaymentOutlined className="text-lg" />
                                 <span>Payout</span>
                             </div>
                         </NavLink>
@@ -70,7 +82,7 @@ export default function Sidebar() {
                             className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
                         >
                             <div className="flex items-center gap-x-2">
-                                <VscBook className="text-lg" />
+                                <NotificationImportantOutlined className="text-lg" />
                                 <span>Notifications</span>
                             </div>
                         </NavLink>
@@ -80,7 +92,7 @@ export default function Sidebar() {
                             onClick={() => console.log("Resetting course state...")}
                         >
                             <div className="flex items-center gap-x-2">
-                                <VscBook className="text-lg" />
+                                <ReportProblemOutlined className="text-lg" />
                                 <span>Reports</span>
                             </div>
                         </NavLink>
@@ -90,7 +102,7 @@ export default function Sidebar() {
                             onClick={() => console.log("Resetting course state...")}
                         >
                             <div className="flex items-center gap-x-2">
-                                <VscBook className="text-lg" />
+                                <LoginOutlined className="text-lg" />
                                 <span>Login-as</span>
                             </div>
                         </NavLink>
@@ -133,7 +145,7 @@ export default function Sidebar() {
                             onClick={() => console.log("Resetting course state...")}
                         >
                             <div className="flex items-center gap-x-2">
-                                <VscAccount className="text-lg" />
+                                <NotificationImportantOutlined className="text-lg" />
                                 <span>Notifications</span>
                             </div>
                         </NavLink>
@@ -143,7 +155,7 @@ export default function Sidebar() {
                             onClick={() => console.log("Resetting course state...")}
                         >
                             <div className="flex items-center gap-x-2">
-                                <VscAccount className="text-lg" />
+                                <ReportProblemOutlined className="text-lg" />
                                 <span>Reports</span>
                             </div>
                         </NavLink>
@@ -153,7 +165,7 @@ export default function Sidebar() {
                             onClick={() => console.log("Resetting course state...")}
                         >
                             <div className="flex items-center gap-x-2">
-                                <VscAccount className="text-lg" />
+                                <LoginOutlined className="text-lg" />
                                 <span>Login-as</span>
                             </div>
                         </NavLink>
@@ -166,15 +178,6 @@ export default function Sidebar() {
 
             {/* Settings and Logout */}
             <div className="flex flex-col">
-                <NavLink
-                    to="/dashboard/settings"
-                    className={({ isActive }) => `relative px-8 py-2 text-sm font-medium transition-all duration-200 ${isActive ? "bg-blue-500 text-white" : "text-richblack-300"}`}
-                >
-                    <div className="flex items-center gap-x-2">
-                        <VscSettingsGear className="text-lg" />
-                        <span>Settings</span>
-                    </div>
-                </NavLink>
                 <button
                     onClick={(e) => handleLogOut(e)}
                     className="px-8 py-2 text-sm font-medium text-richblack-300"
